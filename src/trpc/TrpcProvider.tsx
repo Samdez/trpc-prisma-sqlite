@@ -7,50 +7,51 @@ import superjson from "superjson";
 import { trpcReact } from "@/trpc/trpcReact";
 
 export const TrpcProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
+	children,
 }) => {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnMount: false,
-            refetchOnReconnect: false,
-            refetchOnWindowFocus: false,
-            retry: false,
-            retryOnMount: false,
-            // cacheTime: 0, // avoid caching between resource views (possibly having different fields)
-            // staleTime: 5000,
-          },
-        },
-      })
-  );
+	const [queryClient] = useState(
+		() =>
+			new QueryClient({
+				defaultOptions: {
+					queries: {
+						refetchOnMount: false,
+						refetchOnReconnect: false,
+						refetchOnWindowFocus: false,
+						retry: false,
+						retryOnMount: false,
+						//TODO: set cache to improve performace on Client side
+						// cacheTime: 0, // avoid caching between resource views (possibly having different fields)
+						// staleTime: 5000,
+					},
+				},
+			})
+	);
 
-  const url = "/api/trpc";
+	const url = "/api/trpc";
 
-  const [trpcClient] = useState(() =>
-    trpcReact.createClient({
-      links: [
-        loggerLink({
-          enabled: () => true,
-        }),
-        httpBatchLink({
-          url,
-          fetch: async (input, init?) => {
-            const fetch = getFetch();
-            return fetch(input, {
-              ...init,
-              credentials: "include",
-            });
-          },
-        }),
-      ],
-      transformer: superjson,
-    })
-  );
-  return (
-    <trpcReact.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </trpcReact.Provider>
-  );
+	const [trpcClient] = useState(() =>
+		trpcReact.createClient({
+			links: [
+				loggerLink({
+					enabled: () => true,
+				}),
+				httpBatchLink({
+					url,
+					fetch: async (input, init?) => {
+						const fetch = getFetch();
+						return fetch(input, {
+							...init,
+							credentials: "include",
+						});
+					},
+				}),
+			],
+			transformer: superjson,
+		})
+	);
+	return (
+		<trpcReact.Provider client={trpcClient} queryClient={queryClient}>
+			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+		</trpcReact.Provider>
+	);
 };

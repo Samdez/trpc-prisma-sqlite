@@ -8,28 +8,29 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  name     String?
-  
-  posts    Post[]
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+
+  posts Post[]
 }
 
+//TODO: add indexes if necessary (for example indexing on author, since we'll probably want to fetch all posts by author a lot)
 model Post {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   title     String
   content   String?
-  published Boolean  @default(false)
+  published Boolean @default(false)
 
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
-  comments  Comment[]
+  author   User?     @relation(fields: [authorId], references: [id])
+  authorId Int?
+  comments Comment[]
 }
 
 model Comment {
-  id        Int     @id @default(autoincrement())
-  content   String
+  id      Int    @id @default(autoincrement())
+  content String
 
-  post      Post    @relation(fields: [postId], references: [id])
-  postId    Int
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int
 }
